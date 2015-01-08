@@ -153,3 +153,63 @@ all.equal(ndvi, ndvi3)
 # One single line is sufficient to project any raster to any projection
 ndviLL <- projectRaster(ndvi, crs='+proj=longlat')
 
+# Since this function will write a file to your working directory
+# you want to make sure that it is set where you want the file to be written
+# It can be changed using setwd()
+# Note that we are using the filename argument, contained in the elypsis (...) of 
+# the function, since we want to write the output directly to file.
+ KML(x=ndviLL, filename='gewataNDVI.kml')
+
+## 7.4 More raster arythmetics, perform simple value replacements
+
+# Download the data
+download(url='https://github.com/GeoScripting-WUR/IntroToRaster/raw/gh-pages/data/LE70530722000126_sub.gri', "LE70530722000126_sub.gri", mode = "wb")
+download(url='https://github.com/GeoScripting-WUR/IntroToRaster/raw/gh-pages/data/LE70530722000126_sub.grd', "LE70530722000126_sub.grd", mode = "wb")
+
+# Load the data as a rasterBrick object and investigate its content
+tahiti <- brick('LE70530722000126_sub.grd')
+tahiti
+
+# Display names of each individual layers
+names(tahiti)
+# [1] "LE70530722000126_sub_band1"  "LE70530722000126_sub_band2" 
+# [3] "LE70530722000126_sub_band3"  "LE70530722000126_sub_band4" 
+# [5] "LE70530722000126_sub_band5"  "LE70530722000126_sub_band7" 
+# [7] "LE70530722000126_sub_cfmask"
+
+# Visualize the data
+plotRGB(tahiti, 3,4,5)
+plot(tahiti, 7)
+
+# Extract cloud layer from the brick
+cloud <- tahiti[[7]]
+
+# Replace 'clear Land by NA'
+cloud[cloud == 0] <- NA
+
+# Plot the stack and the cloud mask on top of each others
+plotRGB(tahiti, 3,4,5)
+plot(cloud, add = TRUE, legend = FALSE)
+
+# Extract cloud Mask rasterLayer
+fmask <- tahiti[[7]]
+# Remove fmask layer from the Landsat stack
+tahiti6 <- dropLayer(tahiti, 7)
+# Perform value replacement
+tahiti6[fmask != 0] <- NA
+
+# overlay() approach:
+# First define a value replacement function
+cloud2NA <- function(x, y){
+     x[y != 0] <- NA
+     return(x)
+}
+
+# Let's create a new 6 layers object since tahiti6 has been masked already
+tahiti6_2 <- dropLayer(tahiti, 7)
+
+# Apply the function on the two raster objects using overlay
+tahitiCloudFree <- overlay(x = tahiti6_2, y = fmask, fun = cloud2NA)
+
+# Visualize the output
+plotRGB(tahitiCloudFree, 3,4,5)
