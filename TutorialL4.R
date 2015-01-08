@@ -103,3 +103,26 @@ plot(gewataSub, 1)
 
 ## 6.5 Creating layer stacks
 
+# Again, make sure that your working directory is properly set
+getwd()
+
+# Download the data
+fileUrl <- "https://github.com/GeoScripting-WUR/IntroToRaster/raw/gh-pages/data/tura.zip"
+download(fileUrl, "tura.zip", mode = "wb")
+unzip(zipfile='tura.zip')
+
+# Retrieve the content of the tura sub-directory
+list <- list.files(path='tura/', full.names=TRUE)
+plot(raster(list[1]))
+
+# Create stack of files
+turaStack <- stack(list)
+turaStack
+
+# Write this file at the root of the working directory
+writeRaster(x=turaStack, filename='turaStack.grd', datatype='INT2S')
+
+## 7 Simple raster arithmetic
+
+## 7.2 Subsetting layers from from RasterStack and RasterBrick
+
