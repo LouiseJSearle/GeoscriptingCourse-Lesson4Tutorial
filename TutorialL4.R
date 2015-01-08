@@ -77,3 +77,29 @@ gewataB1
 # names       : LE71700552001036SGS00_SR_Gewata_INT1U 
 # values      : 4, 39  (min, max)
 
+?dataType
+# Setting the data type is useful if you want to write values to disk. 
+# In other cases use functions such as round()
+# Datatype definition     minimum possible value	maximum possible value
+# LOG1S	 FALSE (0)	 TRUE (1)
+# INT1S	 -127	 127
+# INT1U	 0	 255
+# INT2S	 -32,767	 32,767
+# INT2U	 0	 65,534
+# INT4S	 -2,147,483,647	 2,147,483,647
+# INT4U	 0	 4,294,967,296
+# FLT4S	 -3.4e+38	 3.4e+38
+# FLT8S	 -1.7e+308	 1.7e+308
+
+## 6.4 Croping a raster objectvv
+
+# Plot the first layer of the RasterBrick
+plot(gewata, 1)
+e <- drawExtent(show=TRUE) ## you click on map to select extent!
+# Crop gewata using e
+gewataSub <- crop(gewata, e)
+# Now visualize the new cropped object
+plot(gewataSub, 1)
+
+## 6.5 Creating layer stacks
+
