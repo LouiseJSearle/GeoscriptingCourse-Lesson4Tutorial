@@ -126,3 +126,30 @@ writeRaster(x=turaStack, filename='turaStack.grd', datatype='INT2S')
 
 ## 7.2 Subsetting layers from from RasterStack and RasterBrick
 
+ndvi <- (gewata[[4]] - gewata[[3]]) / (gewata[[4]] + gewata[[3]])
+plot(ndvi)
+
+# Define the function to calculate NDVI from 
+# calc()
+ndvCalc <- function(x) {
+     ndvi <- (x[[4]] - x[[3]]) / (x[[4]] + x[[3]])
+     return(ndvi)
+}
+ndvi2 <- calc(x=gewata, fun=ndvCalc)
+# overlay()
+ndvOver <- function(x, y) {
+     ndvi <- (y - x) / (x + y)
+     return(ndvi)
+}
+ndvi3 <- overlay(x=gewata[[3]], y=gewata[[4]], fun=ndvOver)
+# Verify
+all.equal(ndvi, ndvi2)
+# TRUE
+all.equal(ndvi, ndvi3)
+# TRUE
+
+## 7.3 Re-projections
+
+# One single line is sufficient to project any raster to any projection
+ndviLL <- projectRaster(ndvi, crs='+proj=longlat')
+
